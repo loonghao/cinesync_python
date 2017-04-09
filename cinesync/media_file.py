@@ -1,11 +1,11 @@
-import cinesync
-
 import os
 import re
 from urlparse import urlparse
 
+import cinesync
 
-class MediaBase:
+
+class MediaBase(object):
     def __init__(self):
         self.user_data = ''
         self.active = False
@@ -26,7 +26,7 @@ class MediaBase:
 
 class MediaFile(MediaBase):
     def __init__(self, locator_arg=None, path_module=os.path):
-        MediaBase.__init__(self)
+        super(MediaFile, self).__init__()
         self.locator = MediaLocator(locator_arg, path_module)
         self.name = ''
         if self.locator and (self.locator.path or self.locator.url):
@@ -42,7 +42,9 @@ class MediaFile(MediaBase):
 
     def uses_pro_features(self):
         return MediaBase.uses_pro_features(self) or any([elem is not None for elem \
-                in [self.zoom_state_elem, self.pixel_ratio_elem, self.mask_elem, self.color_grading_elem]])
+                                                         in
+                                                         [self.zoom_state_elem, self.pixel_ratio_elem, self.mask_elem,
+                                                          self.color_grading_elem]])
 
     def is_valid(self):
         return MediaBase.is_valid(self) and \
@@ -66,7 +68,7 @@ class MediaAnnotations(dict):
 
 class GroupMovie(MediaBase):
     def __init__(self, group):
-        MediaBase.__init__(self)
+        super(GroupMovie, self).__init__()
         self.group = group
 
     def uses_pro_features(self):
@@ -79,7 +81,7 @@ class GroupMovie(MediaBase):
         return cinesync.csc_xml.group_movie_to_xml(self)
 
 
-class MediaLocator:
+class MediaLocator(object):
     def __init__(self, path_or_url_or_hash=None, path_module=os.path):
         self.path = None
         self.url = None

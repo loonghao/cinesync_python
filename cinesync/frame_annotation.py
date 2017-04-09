@@ -3,7 +3,7 @@ import cinesync
 import types
 
 
-class FrameAnnotation:
+class FrameAnnotation(object):
     def __init__(self, frame_num):
         self.frame = frame_num
         self.notes = ''
