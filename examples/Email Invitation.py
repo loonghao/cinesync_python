@@ -8,7 +8,7 @@ from email.mime.text import MIMEText
 with cinesync.EventHandler() as evt:
     if evt.is_offline(): sys.exit()
 
-    join_url = cinesync.commands.join_session_url(evt.session_key)
+    join_url = cinesync.commands.open_session_file(evt.session_key)
     msg = MIMEText("Come join my cineSync session! Just click here: <%s>\n" % join_url)
     msg["From"] = sys.argv[2]
     msg["To"] = sys.argv[3]

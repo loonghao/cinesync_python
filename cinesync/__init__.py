@@ -42,24 +42,29 @@ OFFLINE_KEY = '_OFFLINE_'
 ONLINE_KEY = '_ONLINE_'
 SESSION_V3_NAMESPACE = 'http://www.cinesync.com/ns/session/3.0'
 
+import hashlib
+import os
+import platform
+import struct
+import subprocess
 
-import os, sys, platform, subprocess, hashlib, struct
-
-from session import Session
-from media_file import MediaFile, GroupMovie, MediaLocator
-from frame_annotation import FrameAnnotation
-from play_range import PlayRange
-from event_handler import EventHandler
-import csc_xml
 import commands
+import csc_xml
 import yaml
+from event_handler import EventHandler
+from frame_annotation import FrameAnnotation
+from media_file import MediaFile, GroupMovie, MediaLocator
+from play_range import PlayRange
+from session import Session
 
 
 class CineSyncError(Exception):
     """Base class for errors in the cinesync package."""
 
+
 class InvalidError(CineSyncError):
     pass
+
 
 def short_hash(path):
     f = open(path, 'rb')
@@ -78,24 +83,27 @@ def short_hash(path):
         dgst.update(f.read(SHORT_HASH_SAMPLE_SIZE / 2))
     return dgst.hexdigest()
 
+
 def open_config(filename):
     if os.path.exists(filename):
         f = open(filename)
         settings = yaml.load(f)
         f.close()
         return settings
-    
+
     print("Could not open config file")
     return {}
-    
+
+
 def write_config(filename, config):
-    f = open(filename,'w')
-    yaml.dump(config,f)
+    f = open(filename, 'w')
+    yaml.dump(config, f)
     f.close()
 
+
 def open_url(url):
-    #not sure why but on some linux versions playtform.system()
-    #can fail. In this case we revert to os.uname()
+    # not sure why but on some linux versions playtform.system()
+    # can fail. In this case we revert to os.uname()
     try:
         system = platform.system()
     except:

@@ -1,9 +1,11 @@
 #!/usr/bin/python2.6
 
-import sys, os, cinesync
+import sys
+
+import cinesync
 
 if len(sys.argv) == 1:
-    print >>sys.stderr, 'Usage: %s <file.mov> ...' % sys.argv[0]
+    print >> sys.stderr, 'Usage: %s <file.mov> ...' % sys.argv[0]
     sys.exit(1)
 
 # Create the session and add media from command-line arguments

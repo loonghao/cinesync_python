@@ -5,10 +5,12 @@
 # Desktop. This file can then be processed by other scripts or opened in a
 # spreadsheet program (Microsoft Excel, OpenOffice.org Calc, Apple Numbers).
 
-from __future__ import with_statement # For Python < 2.6
+from __future__ import with_statement  # For Python < 2.6
 
-import sys, os, csv, cinesync
+import csv
+import os
 
+import cinesync
 
 with cinesync.EventHandler() as evt:
     if evt.is_offline():
@@ -19,7 +21,7 @@ with cinesync.EventHandler() as evt:
 
     with open(path, 'wb') as file:
         csv_file = csv.writer(file)
-        csv_file.writerow(['Media File', 'Frame', 'Notes']) # Header row
+        csv_file.writerow(['Media File', 'Frame', 'Notes'])  # Header row
 
         if evt.session.notes:
             csv_file.writerow(['', '[Session]', evt.session.notes])
