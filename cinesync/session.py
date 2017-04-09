@@ -1,6 +1,7 @@
 import cinesync
 
-class Session:
+
+class Session(object):
     def __init__(self):
         self.file_version = cinesync.SESSION_V3_XML_FILE_VERSION
         self.user_data = ''

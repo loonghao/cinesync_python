@@ -32,8 +32,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 """
 
-from __future__ import with_statement
-
 __author__ = 'Jonathon Mah <jmah@cinesync.com>'
 __version__ = '1.0'
 
@@ -41,6 +39,7 @@ SESSION_V3_XML_FILE_VERSION = 3
 SHORT_HASH_SAMPLE_SIZE = 2048
 ALL_FILES_GROUP = 'All Files'
 OFFLINE_KEY = '_OFFLINE_'
+ONLINE_KEY = '_ONLINE_'
 SESSION_V3_NAMESPACE = 'http://www.cinesync.com/ns/session/3.0'
 
 
@@ -53,6 +52,7 @@ from play_range import PlayRange
 from event_handler import EventHandler
 import csc_xml
 import commands
+import yaml
 
 
 class CineSyncError(Exception):
@@ -62,25 +62,48 @@ class InvalidError(CineSyncError):
     pass
 
 def short_hash(path):
-    with open(path, 'rb') as f:
-        f.seek(0, os.SEEK_END)
-        size = f.tell()
-        f.seek(0)
+    f = open(path, 'rb')
+    f.seek(0, os.SEEK_END)
+    size = f.tell()
+    f.seek(0)
 
-        dgst = hashlib.sha1()
-        dgst.update(struct.pack('!L', size)[::-1])
-        if size <= SHORT_HASH_SAMPLE_SIZE:
-            dgst.update(f.read(size))
-            dgst.update(struct.pack('x' * (SHORT_HASH_SAMPLE_SIZE - size)))
-        else:
-            dgst.update(f.read(SHORT_HASH_SAMPLE_SIZE / 2))
-            f.seek(-SHORT_HASH_SAMPLE_SIZE / 2, os.SEEK_END)
-            dgst.update(f.read(SHORT_HASH_SAMPLE_SIZE / 2))
-        return dgst.hexdigest()
+    dgst = hashlib.sha1()
+    dgst.update(struct.pack('!L', size)[::-1])
+    if size <= SHORT_HASH_SAMPLE_SIZE:
+        dgst.update(f.read(size))
+        dgst.update(struct.pack('x' * (SHORT_HASH_SAMPLE_SIZE - size)))
+    else:
+        dgst.update(f.read(SHORT_HASH_SAMPLE_SIZE / 2))
+        f.seek(-SHORT_HASH_SAMPLE_SIZE / 2, os.SEEK_END)
+        dgst.update(f.read(SHORT_HASH_SAMPLE_SIZE / 2))
+    return dgst.hexdigest()
+
+def open_config(filename):
+    if os.path.exists(filename):
+        f = open(filename)
+        settings = yaml.load(f)
+        f.close()
+        return settings
+    
+    print("Could not open config file")
+    return {}
+    
+def write_config(filename, config):
+    f = open(filename,'w')
+    yaml.dump(config,f)
+    f.close()
 
 def open_url(url):
-    system = platform.system()
+    #not sure why but on some linux versions playtform.system()
+    #can fail. In this case we revert to os.uname()
+    try:
+        system = platform.system()
+    except:
+        system = os.uname()[0]
+
     if system == 'Darwin':
         subprocess.call(['open', url])
     elif system == 'Windows':
         subprocess.call(['cmd', '/c', 'start', '', '/b', url])
+    elif system == 'Linux':
+        subprocess.call(['xdg-open', url])

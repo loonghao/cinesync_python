@@ -1,14 +1,17 @@
-import cinesync
-import cinesync.media_file
 import sys
 import types
 from StringIO import StringIO
 
+import cinesync
+import cinesync.media_file
+
 try:
     from lxml import etree as ET
+
     USING_LXML = True
 except ImportError:
     import xml.etree.cElementTree as ET
+
     USING_LXML = False
 
 NS = '{%s}' % cinesync.SESSION_V3_NAMESPACE
@@ -61,12 +64,14 @@ def session_from_xml(str_or_file, silent=False):
     # Do a few checks (the user should have already confirmed that the
     # document conforms to the schema, but we'll try to fail early in case)
     if not elem.tag == (NS + 'session'):
-        raise cinesync.CineSyncError('Expected to find root <session> element with attribute xmlns="%s"' % cinesync.SESSION_V3_NAMESPACE)
+        raise cinesync.CineSyncError(
+            'Expected to find root <session> element with attribute xmlns="%s"' % cinesync.SESSION_V3_NAMESPACE)
 
     doc_version = int(elem.get('version'))
     if doc_version > cinesync.SESSION_V3_XML_FILE_VERSION:
         if not silent:
-            print >> sys.stderr, 'Warning: Loading session file with a newer version (%d) than this library (%d)' % (doc_version, cinesync.SESSION_V3_XML_FILE_VERSION)
+            print >> sys.stderr, 'Warning: Loading session file with a newer version (%d) than this library (%d)' % (
+            doc_version, cinesync.SESSION_V3_XML_FILE_VERSION)
 
     session = cinesync.Session()
     session.file_version = doc_version
@@ -89,6 +94,7 @@ def session_from_xml(str_or_file, silent=False):
 def media_from_xml(elem):
     return group_movie_from_xml(elem) if elem.find(NS + 'groupMovie') is not None else media_file_from_xml(elem)
 
+
 def init_media_common(elem, media_obj):
     media_obj.user_data = elem.get('userData') or ''
     media_obj.active = elem.get('active') == 'true'
@@ -98,6 +104,7 @@ def init_media_common(elem, media_obj):
     play_range_elem = elem.find(NS + 'playRange')
     if play_range_elem is not None:
         media_obj.play_range = cinesync.PlayRange.load(play_range_elem)
+
 
 def media_base_to_xml(media):
     elem = ET.Element('media')
@@ -141,6 +148,7 @@ def media_file_from_xml(elem):
 
     return mf
 
+
 def media_file_to_xml(mf):
     elem = media_base_to_xml(mf)
     ET.SubElement(elem, 'name').text = mf.name
@@ -173,6 +181,7 @@ def group_movie_from_xml(elem):
     init_media_common(elem, gm)
     return gm
 
+
 def group_movie_to_xml(gm):
     elem = media_base_to_xml(gm)
     gm_elem = ET.SubElement(elem, 'groupMovie')
@@ -190,6 +199,7 @@ def media_locator_from_xml(elem):
     if elem.findtext(NS + 'shortHash'):  loc.short_hash = elem.findtext(NS + 'shortHash')
     if elem.findtext(NS + 'url'): loc.url = elem.findtext(NS + 'url')
     return loc
+
 
 def locator_to_xml(loc):
     if not loc.is_valid():
@@ -212,6 +222,7 @@ def play_range_from_xml(elem):
     play_range.out_frame = int(elem.find(NS + 'outFrame').get('value'))
     play_range.play_only_range = elem.find(NS + 'playOnlyRange').get('value') == 'true'
     return play_range
+
 
 def play_range_to_xml(play_range):
     if not play_range.is_valid():
@@ -239,6 +250,7 @@ def frame_annotation_from_xml(elem):
         for draw_elem in elem.findall(NS + tag):
             ann.drawing_objects.append(strip_namespace(draw_elem))
     return ann
+
 
 def frame_annotation_to_xml(ann):
     if not ann.is_valid():

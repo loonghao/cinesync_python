@@ -1,9 +1,9 @@
-import cinesync
-
 import types
 
+import cinesync
 
-class PlayRange:
+
+class PlayRange(object):
     def __init__(self):
         self.in_frame = None
         self.out_frame = None
@@ -14,9 +14,9 @@ class PlayRange:
 
     def is_valid(self):
         return self.is_default() or \
-            isinstance(self.in_frame, (types.IntType, types.LongType)) and \
-            isinstance(self.out_frame, (types.IntType, types.LongType)) and \
-            self.in_frame >= 1 and self.out_frame >= 1 and self.out_frame >= self.in_frame
+               isinstance(self.in_frame, (types.IntType, types.LongType)) and \
+               isinstance(self.out_frame, (types.IntType, types.LongType)) and \
+               self.in_frame >= 1 and self.out_frame >= 1 and self.out_frame >= self.in_frame
 
     def to_xml(self):
         return cinesync.csc_xml.play_range_to_xml(self)
